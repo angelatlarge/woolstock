@@ -15,19 +15,40 @@ def main():
   with open('diodes.csv', 'r') as csvfile:
     csvComponents = csv.DictReader(csvfile)
     # csvComponents = csv.reader(csvfile, delimiter=',', quotechar='"')
+    labelWidth = 1
+    labelHeight = 2.625
+    labelsStartY = 0.125
+    labelsStartX = 0.5
+
     xMargin = 0.125/2
     yMargin = 0.125/2
-    x = 0.5 + xMargin
-    y = 0.125 + yMargin
-    width = 1.0 - xMargin*2
+
+    labelStartY = labelsStartY
+    labelStartX = labelsStartX
+    labelEndY = labelsStartY + labelHeight
+    labelEndX = labelsStartX + labelWidth
+    x = labelsStartX + xMargin
+    y = labelStartY + yMargin
+    availableWidth = labelWidth - xMargin*2
     height = 1.0 - xMargin*2
     interComponentMargin = .125
 
     ctx = cairoInitialize()
     # csvComponents.next()
-    for csvComponent in csvComponents:
-      y = processDiode(ctx, x, y, width, csvComponent)
-      y += interComponentMargin
+    csvComponent = csvComponents.next()
+    try:
+      while csvComponent:
+        newY = processDiode(ctx, x, y, availableWidth, csvComponent, False)
+        if newY < labelEndY - yMargin:
+          processDiode(ctx, x, y, availableWidth, csvComponent, True)
+          y = newY + interComponentMargin
+          csvComponent = csvComponents.next()
+        else:
+          y = labelStartY + yMargin
+          labelsStartX += labelWidth
+          x = labelsStartX + xMargin
+    except StopIteration:
+      pass
   
 def cairoInitialize():
   surface = cairo.PDFSurface("diodes.pdf", 11*72, 8.5*72)
@@ -57,8 +78,10 @@ def cairoInitialize():
 
   return ctx
 
-def processDiode(ctx, x, y, width, csvComponent):
+def processDiode(ctx, x, y, width, csvComponent, draw):
   typeMap = {"GENERAL": "diode", "SCHOTTKY": "schottky diode"}
+
+
   ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
   # ctx.select_font_face('Asana Math')
   ctx.set_font_size(0.125) 
@@ -67,7 +90,8 @@ def processDiode(ctx, x, y, width, csvComponent):
   (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = ctx.font_extents()
   y += (fe_ascent) * 1.00
   ctx.move_to(x+(width - e_width)/2.0, y) 
-  ctx.show_text(typeMap[csvComponent["Type"]])
+  # glyphs.append(ctx.text_to_glyphs(xStart, y, typeMap[csvComponent["Type"]]))
+  if draw: ctx.show_text(typeMap[csvComponent["Type"]])
   # y += (fe_descent) * 1.00
 
   ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
@@ -75,7 +99,8 @@ def processDiode(ctx, x, y, width, csvComponent):
   (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = ctx.font_extents()
   y += (fe_ascent) * 1.5
   ctx.move_to(x+(width - e_width)/2.0, y) 
-  ctx.show_text(csvComponent["ID"])
+  # glyphs.append(ctx.text_to_glyphs(xStart, y, csvComponent["ID"]))
+  if draw: ctx.show_text(csvComponent["ID"])
   # y += (fe_descent) * 1.00
 
   ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
@@ -98,7 +123,9 @@ def processDiode(ctx, x, y, width, csvComponent):
   y += (fe_ascent) * 1.5
   xStart = x+(width - e_width)/2.0
   ctx.move_to(xStart, y) 
-  ctx.show_text(specsText)
+  
+  # glyphs.append(ctx.text_to_glyphs(xStart, y, specsText))
+  if draw: ctx.show_text(specsText)
 
   # ctx.move_to(xStart, y-fe_ascent) 
   # ctx.line_to(xStart+e_width, y-fe_ascent) 
