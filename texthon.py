@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
 
 import csv
 import argparse
@@ -7,20 +8,26 @@ import cairocffi as cairo
 # import pandas as pd
 
 def main():
+  # csvComponents = pd.read_csv('diodes.csv')
+  # for csvComponent in csvComponents:
+  #   print csvComponent
+
   with open('diodes.csv', 'r') as csvfile:
-    csvComponents = csv.reader(csvfile, delimiter=',', quotechar='"')
+    csvComponents = csv.DictReader(csvfile)
+    # csvComponents = csv.reader(csvfile, delimiter=',', quotechar='"')
     xMargin = 0.125/2
     yMargin = 0.125/2
     x = 0.5 + xMargin
     y = 0.125 + yMargin
     width = 1.0 - xMargin*2
     height = 1.0 - xMargin*2
+    interComponentMargin = .125
 
     ctx = cairoInitialize()
-    csvComponents.next()
+    # csvComponents.next()
     for csvComponent in csvComponents:
-      processDiode(ctx, x, y, width, csvComponent)
-      break
+      y = processDiode(ctx, x, y, width, csvComponent)
+      y += interComponentMargin
   
 def cairoInitialize():
   surface = cairo.PDFSurface("diodes.pdf", 11*72, 8.5*72)
@@ -56,17 +63,70 @@ def processDiode(ctx, x, y, width, csvComponent):
   # ctx.select_font_face('Asana Math')
   ctx.set_font_size(0.125) 
   ctx.set_source_rgb(0, 0, 0) 
-  (e_x, e_y, e_width, e_height, e_dx, e_dy) = ctx.text_extents(typeMap[csvComponent[1]])
-  y += (e_height) * 1.25
+  (e_x, e_y, e_width, e_height, e_dx, e_dy) = ctx.text_extents(typeMap[csvComponent["Type"]])
+  (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = ctx.font_extents()
+  y += (fe_ascent) * 1.00
   ctx.move_to(x+(width - e_width)/2.0, y) 
-  ctx.show_text(typeMap[csvComponent[1]])
+  ctx.show_text(typeMap[csvComponent["Type"]])
+  # y += (fe_descent) * 1.00
 
   ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
-  (e_x, e_y, e_width, e_height, e_dx, e_dy) = ctx.text_extents(csvComponent[0])
-  y += (e_height) * 1.25
+  (e_x, e_y, e_width, e_height, e_dx, e_dy) = ctx.text_extents(csvComponent["ID"])
+  (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = ctx.font_extents()
+  y += (fe_ascent) * 1.5
   ctx.move_to(x+(width - e_width)/2.0, y) 
-  ctx.show_text(csvComponent[0])
+  ctx.show_text(csvComponent["ID"])
+  # y += (fe_descent) * 1.00
 
+  ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
+  specs = []
+
+  specs.append(csvComponent["Vmax, V"] + "V")
+
+  iMax = float(csvComponent["Imax, A"])
+  iMaxText = str(iMax) + "A" if iMax >= 1 else str(int(iMax * 1000)) + "mA"
+  specs.append(iMaxText)
+  
+  if (csvComponent["Recovery time, ns"]):
+    time = long(csvComponent["Recovery time, ns"])
+    timeText = str(time) + "ns" if time < 1000 else str(time/1000) + "μs"
+    specs.append(timeText)
+
+  specsText = " ".join(specs)
+  (e_x, e_y, e_width, e_height, e_dx, e_dy) = ctx.text_extents(specsText)
+  (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = ctx.font_extents()
+  y += (fe_ascent) * 1.5
+  xStart = x+(width - e_width)/2.0
+  ctx.move_to(xStart, y) 
+  ctx.show_text(specsText)
+
+  # ctx.move_to(xStart, y-fe_ascent) 
+  # ctx.line_to(xStart+e_width, y-fe_ascent) 
+  # ctx.line_to(xStart+e_width, y-fe_ascent+fe_height) 
+  # ctx.line_to(xStart, y+fe_descent) 
+  # ctx.line_to(xStart, y-fe_ascent) 
+  # ctx.stroke()
+  # ctx.move_to(xStart, y) 
+  # ctx.line_to(xStart+e_width, y) 
+  # ctx.stroke()
+
+  # y += (fe_descent) * 1.00
+
+  # ctx.move_to(x+(width - e_width)/2.0, y) 
+  # ctx.line_to(x+e_width, y) 
+  # ctx.line_to(x+e_width, y+e_height) 
+  # ctx.line_to(x, y+e_height) 
+  # ctx.line_to(x, y) 
+  # ctx.stroke()
+
+  # ctx.move_to(x+(width - e_width)/2.0, y) 
+  # ctx.line_to(x+e_width, y) 
+  # ctx.line_to(x+e_width, y+e_y) 
+  # ctx.line_to(x, y+e_y) 
+  # ctx.line_to(x, y) 
+  # ctx.stroke()
+
+  return y
 
 if __name__ == "__main__":
     main()
