@@ -5,7 +5,7 @@ import csv
 import argparse
 import math
 import cairocffi as cairo
-# import pandas as pd
+from diodecomponent import DiodeComponent
 
 def main():
   # csvComponents = pd.read_csv('diodes.csv')
@@ -34,13 +34,13 @@ def main():
     interComponentMargin = .125
 
     ctx = cairoInitialize()
-    # csvComponents.next()
     csvComponent = csvComponents.next()
     try:
       while csvComponent:
-        newY = processDiode(ctx, x, y, availableWidth, csvComponent, False)
+        component = DiodeComponent(csvComponent)
+        newY = component.measure(ctx, x, y, availableWidth)
         if newY < labelEndY - yMargin:
-          processDiode(ctx, x, y, availableWidth, csvComponent, True)
+          component.draw(ctx, x, y, availableWidth)
           y = newY + interComponentMargin
           csvComponent = csvComponents.next()
         else:
