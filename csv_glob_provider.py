@@ -21,7 +21,3 @@ class CsvGlobProvider:
 
   def __contains__(self, itemName):
     return itemName in self.components
-
-
-# now you can call it directly with basename
-print basename("/a/b/c.txt")    

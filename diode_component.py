@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 
-from labelsheet import LabelText, LabelLine, FontType
+from label_sheet import LabelText, LabelLine, FontType
 
 class DiodeComponent:
   def __init__(self, propertiesDict):

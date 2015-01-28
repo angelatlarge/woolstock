@@ -5,8 +5,8 @@ import csv
 import argparse
 import math
 import cairocffi as cairo
-from diodecomponent import DiodeComponent
-from labelsheet import LabelSheet
+from diode_component import DiodeComponent
+from label_sheet import LabelSheet
 from component_type import ComponentType
 from csv_glob_provider import CsvGlobProvider
 
