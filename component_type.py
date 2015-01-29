@@ -6,3 +6,4 @@ def enum(**enums):
 
 ComponentType = enum(DIODE=1, LED=2)
 
+componentTypeNames = {ComponentType.DIODE: "diode", ComponentType.LED: "LED"}

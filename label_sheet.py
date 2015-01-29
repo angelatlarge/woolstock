@@ -29,7 +29,8 @@ class LabelSheet:
     # surface = cairo.ImageSurface (cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
     self.ctx = cairo.Context(self.surface)
     self.ctx.scale (72, 72) # Normalizing the canvas
-    self.draw_background_labels()
+
+    # self.draw_background_labels()
 
     self.xCoord, self.yCoord = (0, 0) if not startCoords else startCoords
     self.moveToLabel(self.xCoord, self.yCoord)
@@ -57,8 +58,7 @@ class LabelSheet:
   @property 
   def interSublabelGapY(self): return 0.125
   @property
-  def fontAscentHeightMult(self): return 1.0
-  # def fontAscentHeightMult(self): return 1.0625
+  def fontAscentHeightMult(self): return 1.25
 
   @property
   def currentLabelX(self):
@@ -102,7 +102,7 @@ class LabelSheet:
   def drawLabelLines(self, labelLines):
     for labelLine in labelLines:
       (w, h) = self.drawLabelLine(labelLine)
-      self.nextY += h
+      # self.nextY += h
     self.nextY += self.interSublabelGapY
 
   def measureLabelLines(self, labelLines):
@@ -170,8 +170,10 @@ class LabelSheet:
   def applyFont(self, textType):
     if textType == FontType.BASIC:
       self.ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
+      # self.ctx.set_font_size(0.125) 
     elif textType == FontType.MAJOR:
       self.ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
+      # self.ctx.set_font_size(0.25) 
     else:
       raise Exception("Unknown font type" + textType)
     self.ctx.set_font_size(0.125) 
