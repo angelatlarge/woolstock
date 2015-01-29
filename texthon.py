@@ -5,6 +5,7 @@ import argparse
 import math
 import cairocffi as cairo
 from diode_component import DiodeComponent
+from led_component import LedComponent
 from label_sheet import LabelSheet
 from component_type import ComponentType
 from csv_glob_provider import CsvGlobProvider
@@ -21,8 +22,7 @@ def main():
 
 
   labelSheet = LabelSheet(args.output)
-  componentClasses = {ComponentType.DIODE: DiodeComponent}
-  # with CsvGlobProvider('diodes.csv') as provider:
+  componentClasses = {ComponentType.DIODE: DiodeComponent, ComponentType.LED: LedComponent}
   # with OsvProvider("../components.ods") as provider:
   with makeProviderFromParsedArgs(args) as provider:
     for (componentType, componentClass) in componentClasses.iteritems():

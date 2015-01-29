@@ -2,10 +2,9 @@
 # This Python file uses the following encoding: utf-8
 
 from label_sheet import LabelText, LabelLine, FontType
+from component import Component
 
-class DiodeComponent:
-  def __init__(self, propertiesDict):
-    self.propertiesDict = propertiesDict
+class DiodeComponent(Component):
 
   def makeLabel(self):
     typeMap = {"GENERAL": "diode", "SCHOTTKY": "schottky diode"}

@@ -78,13 +78,16 @@ class LabelSheet:
 
 
   def draw(self, labelLines):
-    w, h = self.measureLabelLines(labelLines)
-    print("Label measured at %f by %f..." % (w, h)),
-    if self.nextY+h > self.currentLabelY+self.labelHeight-self.labelMarginY:
-      print "moving to the next label", 
-      self.moveToNextLabel()
-    self.drawLabelLines(labelLines)
-    print "label drawn"
+    if labelLines:
+      w, h = self.measureLabelLines(labelLines)
+      print("Label measured at %f by %f..." % (w, h)),
+      if self.nextY+h > self.currentLabelY+self.labelHeight-self.labelMarginY:
+        print "moving to the next label", 
+        self.moveToNextLabel()
+      self.drawLabelLines(labelLines)
+      print "label drawn"
+    else:
+      print "no label"
 
   def moveToLabel(self, newCoordX, newCoordY):
     self.xCoord, self.yCoord = (newCoordX, newCoordY)
