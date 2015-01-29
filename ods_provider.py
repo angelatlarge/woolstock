@@ -7,7 +7,7 @@ from component_type import ComponentType, componentTypeNames
 import os
 from os.path import basename, splitext
 
-class OsvProvider:
+class OdsProvider:
   def __init__(self, sourceFilename):
     self.components = {}
     ssconverter = SSConverter()

@@ -8,14 +8,23 @@ from diode_component import DiodeComponent
 from label_sheet import LabelSheet
 from component_type import ComponentType
 from csv_glob_provider import CsvGlobProvider
-from osv_provider import OsvProvider
+from ods_provider import OdsProvider
 
 def main():
+  parser = argparse.ArgumentParser(description='Make electronics labels')
+  parser.add_argument('output', help='Name of the output PDF file')
+  group = parser.add_mutually_exclusive_group(required=True)
+  group.add_argument('--ods', help='ODS source')
+  group.add_argument('--csv', help='CSV source')
+  args = parser.parse_args()
 
-  labelSheet = LabelSheet("labels.pdf")
+
+
+  labelSheet = LabelSheet(args.output)
   componentClasses = {ComponentType.DIODE: DiodeComponent}
   # with CsvGlobProvider('diodes.csv') as provider:
-  with OsvProvider("../components.ods") as provider:
+  # with OsvProvider("../components.ods") as provider:
+  with makeProviderFromParsedArgs(args) as provider:
     for (componentType, componentClass) in componentClasses.iteritems():
       if componentType in provider:
         componentDefinitions = provider[componentType]
@@ -23,33 +32,17 @@ def main():
           component = componentClass(componentProperties)
           labelSheet.draw(component.makeLabel())
         
-  #     componentProperties = csvComponents.next()
-  #     try:
-  #       while componentProperties:
-  #         component = DiodeComponent(componentProperties)
-  #         labelSheet.draw(component.makeLabel())
-  #         componentProperties = csvComponents.next()
-
-  #     except StopIteration:
-  #       pass
-
-  #     provider
-
-  # with open('diodes.csv', 'r') as csvfile:
-  #   csvComponents = csv.DictReader(csvfile)
-
-  #   labelSheet = LabelSheet("labels.pdf")
-  #   componentProperties = csvComponents.next()
-  #   try:
-  #     while componentProperties:
-  #       component = DiodeComponent(componentProperties)
-  #       labelSheet.draw(component.makeLabel())
-  #       componentProperties = csvComponents.next()
-
-  #   except StopIteration:
-  #     pass
-  
-
+def makeProviderFromParsedArgs(args):
+  providerMap = {'ods': OdsProvider, 'csv': CsvGlobProvider}
+  foundNames = 0
+  for name in providerMap.iterkeys():
+    if name in args and args.__dict__[name]:
+      foundNames += 1
+  if foundNames < 1: raise Exception("A source must be provided")
+  if foundNames > 1: raise Exception("Only one source may be provided")
+  for name, providerClass in providerMap.iteritems():
+    if name in args:
+      return providerClass(args.__dict__[name])
 
 if __name__ == "__main__":
     main()
