@@ -17,11 +17,16 @@ def main():
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument('--ods', help='ODS source')
   group.add_argument('--csv', help='CSV source')
+  parser.add_argument('--grid', help='Draw label grid', action='store_true')
+  parser.add_argument('--start', help='Start position for the first label', nargs=2, type=int)
   args = parser.parse_args()
 
 
 
   labelSheet = LabelSheet(args.output)
+  if args.grid:   labelSheet.draw_background_labels()
+  if args.start: labelSheet.moveToLabel(args.start[0], args.start[1])
+
   componentClasses = {ComponentType.DIODE: DiodeComponent, ComponentType.LED: LedComponent}
   # with OsvProvider("../components.ods") as provider:
   with makeProviderFromParsedArgs(args) as provider:

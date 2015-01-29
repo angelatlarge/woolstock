@@ -30,8 +30,6 @@ class LabelSheet:
     self.ctx = cairo.Context(self.surface)
     self.ctx.scale (72, 72) # Normalizing the canvas
 
-    # self.draw_background_labels()
-
     self.xCoord, self.yCoord = (0, 0) if not startCoords else startCoords
     self.moveToLabel(self.xCoord, self.yCoord)
 
