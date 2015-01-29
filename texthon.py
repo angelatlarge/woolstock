@@ -14,8 +14,8 @@ def main():
 
   labelSheet = LabelSheet("labels.pdf")
   componentClasses = {ComponentType.DIODE: DiodeComponent}
-  with CsvGlobProvider('diodes.csv') as provider:
-  # with OsvProvider("../components.ods") as provider:
+  # with CsvGlobProvider('diodes.csv') as provider:
+  with OsvProvider("../components.ods") as provider:
     for (componentType, componentClass) in componentClasses.iteritems():
       if componentType in provider:
         componentDefinitions = provider[componentType]

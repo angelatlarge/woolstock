@@ -50,11 +50,33 @@ class SSConverter:
         """
 
         # Start openoffice if needed.
-        if not self.desktop:
-            if not self.oorunner:
-                self.oorunner = ooutils.OORunner()
+        if True:
+            self.connection = None
+            self.pipe = None
+            self.server = 'localhost'
+            self.port = '2002'
+            self.verbose = 0
+            if not self.connection:
+                if not self.pipe:
+                    self.connection = "socket,host=%s,port=%s;urp;StarOffice.ComponentContext" % (self.server, self.port)
+    #               self.connection = "socket,host=%s,port=%s;urp;" % (self.server, self.port)
+                else:
+                    self.connection = "pipe,name=%s;urp;StarOffice.ComponentContext" % (self.pipe)
+                if self.verbose >=3:
+                    print >>sys.stderr, 'Connection type: %s' % self.connection
 
-            self.desktop = self.oorunner.connect()
+            self.context = uno.getComponentContext()
+            self.svcmgr = self.context.ServiceManager
+            resolver = self.svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", self.context)
+            unocontext = resolver.resolve("uno:%s" % self.connection)
+            unosvcmgr = unocontext.ServiceManager
+            self.desktop = unosvcmgr.createInstanceWithContext("com.sun.star.frame.Desktop", unocontext)
+        else:            
+            if not self.desktop:
+                if not self.oorunner:
+                    self.oorunner = ooutils.OORunner()
+
+                self.desktop = self.oorunner.connect()
 
         # Check for sheet specification in input file name.
         match = re.search(r'^(.*)[@:](.*)$', inputFile)
