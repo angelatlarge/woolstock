@@ -3,7 +3,7 @@
 
 import csv
 from ssconverter import SSConverter
-from component_type import ComponentType, componentTypeNames
+from component_type import ComponentType, getComponentType
 import os
 from os.path import basename, splitext
 
@@ -12,13 +12,12 @@ class OdsProvider:
     self.components = {}
     ssconverter = SSConverter()
     self.outputFilenames = ssconverter.convert(sourceFilename, "%s")
-    for (k, v) in componentTypeNames.iteritems():
-      for filename in self.outputFilenames:
-        bareFilename = splitext(basename(filename))[0].lower().strip()
-        bareName = v.lower().strip()
-        if bareFilename == bareName or bareFilename == bareName+"s":
-          self.components[k] = csv.DictReader(open(filename, 'r'))
-          # self.components[k] = csv.DictReader(filename)
+
+    for filename in self.outputFilenames:
+      bareFilename = splitext(basename(filename))[0].lower().strip()
+      componentType = getComponentType(bareFilename)
+      if componentType:
+          self.components[componentType] = csv.DictReader(open(filename, 'r'))
 
   def __getitem__(self, itemName):
     return self.components[itemName]
