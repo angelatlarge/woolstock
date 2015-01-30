@@ -5,25 +5,49 @@ from label_sheet import LabelText, LabelLine, FontType
 from component import Component
 
 class LedComponent(Component):
+  lensTextDict = {"DIFFUSED": "diffused", "CLEAR": "clear"}
+  commonTextDict = {"C": "cmn cathode", "A": "cmn anode"}
 
   def makeLabel(self):
     labelLines = []
 
+
     summary = []
+    category = []
     mountingType = self.propertiesDict["Mounting Type"]
     if mountingType == "TH":
-      summary.append(self.propertiesDict["Size"])
-      # summary.append(self.propertiesDict["Shape"])
-      # summary.append(self.propertiesDict["Color"])
-      # summary.append(self.propertiesDict["Lens"])
-      # self.propertiesDict["Mounting Type"]
+      category = ["t.h. LED"]
 
+      if self.propertiesDict["Shape"] == "ROUND":
+        summary.append(self.propertiesDict["Size"])
+        summary.append(LedComponent.lensTextDict[self.propertiesDict["Lens"]])
+      elif self.propertiesDict["Shape"] == "RECT":
+        summary.append("Rectangular")
+      else:
+        return None
     elif mountingType == "SMD":
+      category = ["SMD LED"]
       summary.append(self.propertiesDict["Size"])
-      summary.append("SMD")
     else:
       return None
 
+    labelLines.append(LabelLine(LabelText(FontType.BASIC, " ".join(category))))
+    if summary: 
+      labelLines.append(LabelLine(LabelText(FontType.MAJOR, " ".join(summary))))
+    labelLines.append(LabelLine(LabelText(FontType.MAJOR, self.propertiesDict["Color"])))
+    if self.propertiesDict["Common"]: 
+      labelLines.append(LabelLine(LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])))
+
+    #   if mountingType == "TH":
+    #     summary.append(self.propertiesDict["Size"])
+    #     # summary.append(self.propertiesDict["Shape"])
+    #     # summary.append(self.propertiesDict["Color"])
+    #     # summary.append(self.propertiesDict["Lens"])
+    #     # self.propertiesDict["Mounting Type"]
+
+    # elif mountingType == "SMD":
+    #   summary.append(self.propertiesDict["Size"])
+    #   summary.append("SMD")
+
     summary.append("LED")
-    labelLines.append(LabelLine(LabelText(FontType.MAJOR, " ".join(summary))))
     return labelLines
