@@ -2,25 +2,14 @@
 # This Python file uses the following encoding: utf-8
 
 import cairocffi as cairo
+from label_text import LabelText
+from label_line import LabelLine
 
 def enum(**enums):
   return type('Enum', (), enums)
 
 FontType = enum(BASIC=1, MAJOR=2)
 
-class LabelText:
-  def __init__(self, textType, textString):
-    self.textType = textType
-    self.textString = textString
-
-class LabelLine:
-  def __init__(self, *args):
-    self.texts = args
-    # if hasattr(args, '__len__'):
-    #   self.texts = args
-    # else:
-    #   # args is a singleton. Assume just a LabelText
-    #   self.texts = [args]
 
 class LabelSheet:
   def __init__(self, filename, startCoords = None):
@@ -75,14 +64,16 @@ class LabelSheet:
     return self.currentLabelX + self.labelWidth / 2.0
 
 
-  def draw(self, labelLines):
-    if labelLines:
-      w, h = self.measureLabelLines(labelLines)
+  def draw(self, labelBlock):
+    if labelBlock:
+      w, h = labelBlock.measure(self)
       print("Label measured at %f by %f..." % (w, h)),
       if self.nextY+h > self.currentLabelY+self.labelHeight-self.labelMarginY:
         print "moving to the next label", 
         self.moveToNextLabel()
-      self.drawLabelLines(labelLines)
+      (w, h) = labelBlock.draw(self, self.labelCenterX, self.nextY)
+      self.nextY += h
+      self.nextY += self.interSublabelGapY
       print "label drawn"
     else:
       print "no label"
@@ -99,52 +90,6 @@ class LabelSheet:
         self.moveToLabel(0, self.yCoord+1)
     else:
       self.moveToLabel(self.xCoord+1, self.yCoord)
-
-  def drawLabelLines(self, labelLines):
-    for labelLine in labelLines:
-      (w, h) = self.drawLabelLine(labelLine)
-      # self.nextY += h
-    self.nextY += self.interSublabelGapY
-
-  def measureLabelLines(self, labelLines):
-    width = 0
-    height = 0
-    for labelLine in labelLines:
-      w, h = self.measureLabelLine(labelLine)
-      width = max(width, w)
-      height += h
-    return (width, height)
-
-  def drawLabelLine(self, labelLine):
-    w, h = self.measureLabelLine(labelLine)
-    x = self.labelCenterX - w / 2.0
-    self.nextY += h
-    for labelText in labelLine.texts:
-      w, h = self.measureLabelText(labelText)
-      self.drawLabelText(labelText, x, self.nextY)
-      x += w
-    return (w, h)
-
-  def measureLabelLine(self, labelLine):
-    width = 0
-    height = 0
-    for labelText in labelLine.texts:
-      w, h = self.measureLabelText(labelText)
-      height = max(height, h)
-      width += w
-    return (width, height)
-
-
-  def drawLabelText(self, labelText, x, y):
-    self.applyFont(labelText.textType)
-    self.ctx.move_to(x, y) 
-    self.ctx.show_text(labelText.textString)
-
-  def measureLabelText(self, labelText):
-    self.applyFont(labelText.textType)
-    (te_x, te_y, te_width, te_height, te_dx, te_dy) = self.ctx.text_extents(labelText.textString)
-    (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
-    return (te_width, fe_ascent * self.fontAscentHeightMult)
 
   def draw_background_labels(self):
     self.ctx.set_source_rgb (0.75,0.75,0.75)
@@ -166,7 +111,16 @@ class LabelSheet:
 
     self.ctx.stroke()
 
+  def measureText(self, textType, textString):
+    self.applyFont(textType)
+    (te_x, te_y, te_width, te_height, te_dx, te_dy) = self.ctx.text_extents(textString)
+    (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
+    return (te_width, fe_ascent * self.fontAscentHeightMult)
 
+  def drawText(self, textType, textString, x, y):
+    self.applyFont(textType)
+    self.ctx.move_to(x, y) 
+    self.ctx.show_text(textString)
 
   def applyFont(self, textType):
     if textType == FontType.BASIC:

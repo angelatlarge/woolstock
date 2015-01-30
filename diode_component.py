@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 
-from label_sheet import LabelText, LabelLine, FontType
+from label_sheet import FontType
+from label_block import LabelBlock
+from label_line import LabelLine
+from label_text import LabelText
 from component import Component
 
 class DiodeComponent(Component):
@@ -38,4 +41,4 @@ class DiodeComponent(Component):
 
     labelLines.append(LabelLine(LabelText(FontType.BASIC, specsText)))
 
-    return labelLines
+    return LabelBlock(*labelLines) if labelLines else None

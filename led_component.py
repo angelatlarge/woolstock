@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 
-from label_sheet import LabelText, LabelLine, FontType
+from label_sheet import FontType
+from label_block import LabelBlock
+from label_line import LabelLine
+from label_text import LabelText
 from component import Component
 
 class LedComponent(Component):
@@ -49,5 +52,4 @@ class LedComponent(Component):
     #   summary.append(self.propertiesDict["Size"])
     #   summary.append("SMD")
 
-    summary.append("LED")
-    return labelLines
+    return LabelBlock(*labelLines) if labelLines else None
