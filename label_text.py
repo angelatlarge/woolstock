@@ -6,8 +6,20 @@ class LabelText:
     self.textType = textType
     self.textString = textString
 
+  @property
+  def leadingSpace(self): return self.textString and len(self.textString) > 0 and self.textString[0] == " "
+
+  @property
+  def trailingSpace(self): return self.textString and len(self.textString) > 0 and self.textString[-1] == " "
+
+  @property
+  def empty(self): return self.textString
+
   def measure(self, sheet):
     return sheet.measureText(self.textType, self.textString)
+
+  def measureSpace(self, sheet):
+    return sheet.measureText(self.textType, " ")
 
   def draw(self, sheet, x, y):
     return sheet.drawText(self.textType, self.textString, x, y)

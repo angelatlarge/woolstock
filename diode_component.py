@@ -3,7 +3,7 @@
 
 from label_sheet import FontType
 from label_block import LabelBlock
-from label_line import LabelLine
+from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
 from label_text import LabelText
 from component import Component
 
@@ -15,10 +15,10 @@ class DiodeComponent(Component):
     labelLines = []
 
     # TYPE
-    labelLines.append(LabelLine(LabelText(FontType.BASIC, typeMap[self.propertiesDict["Type"]])))
+    labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, typeMap[self.propertiesDict["Type"]])))
 
     # ID/NAME
-    labelLines.append(LabelLine(LabelText(FontType.MAJOR, self.propertiesDict["ID"])))
+    labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, self.propertiesDict["ID"])))
 
     # SPECS (all on one line)
     specs = []
@@ -39,6 +39,6 @@ class DiodeComponent(Component):
 
     specsText = " ".join(specs)
 
-    labelLines.append(LabelLine(LabelText(FontType.BASIC, specsText)))
+    labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, specsText)))
 
     return LabelBlock(*labelLines) if labelLines else None

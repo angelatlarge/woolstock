@@ -115,7 +115,7 @@ class LabelSheet:
     self.applyFont(textType)
     (te_x, te_y, te_width, te_height, te_dx, te_dy) = self.ctx.text_extents(textString)
     (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
-    return (te_width, fe_ascent * self.fontAscentHeightMult)
+    return (te_width, fe_ascent * self.fontAscentHeightMult, te_dx)
 
   def drawText(self, textType, textString, x, y):
     self.applyFont(textType)
