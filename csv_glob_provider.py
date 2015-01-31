@@ -16,8 +16,6 @@ class CsvGlobProvider:
       if componentType:
           self.components[componentType] = csv.DictReader(open(filename, 'r'))
 
-    print self.components
-
   def __getitem__(self, itemName):
     return self.components[itemName]
 

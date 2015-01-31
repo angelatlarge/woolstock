@@ -3,7 +3,6 @@
 
 class LabelBlock:
   def __init__(self, *args):
-    print "LabelBlock.__init()__", args
     self.labelLines = args
 
   def measure(self, sheet):

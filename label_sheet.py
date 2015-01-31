@@ -26,8 +26,10 @@ class LabelSheet:
   def baseFontFace(self): return "Bitstream Charter"
   @property
   def baseFontSize(self): return 0.1
+  # def baseFontSize(self): return 0.18
   @property
   def minorFontSize(self): return 0.08
+  # def minorFontSize(self): return 0.18
   @property
   def sheetWidth(self): return 11.0
   @property
@@ -75,16 +77,16 @@ class LabelSheet:
   def draw(self, labelBlock):
     if labelBlock:
       w, h = labelBlock.measure(self)
-      print("Label measured at %f by %f..." % (w, h)),
+      # print("Label measured at %f by %f..." % (w, h)),
       if self.nextY+h > self.currentLabelY+self.labelHeight-self.labelMarginY:
-        print "moving to the next label", 
+        # print "moving to the next label", 
         self.moveToNextLabel()
       (w, h) = labelBlock.draw(self, self.labelCenterX, self.nextY)
       self.nextY += h
       self.nextY += self.interSublabelGapY
-      print "label drawn"
-    else:
-      print "no label"
+      # print "label drawn"
+    # else:
+      # print "no label"
 
   def moveToLabel(self, newCoordX, newCoordY):
     self.xCoord, self.yCoord = (newCoordX, newCoordY)
@@ -119,27 +121,27 @@ class LabelSheet:
 
     self.ctx.stroke()
 
-  def measureText(self, textType, textString):
-    self.applyFont(textType)
+  def measureText(self, textType, textString, scaleFactor = 1.0):
+    self.applyFont(textType, scaleFactor)
     (te_x, te_y, te_width, te_height, te_dx, te_dy) = self.ctx.text_extents(textString)
     (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
     return (te_width, fe_ascent * self.fontAscentHeightMult, te_dx)
 
-  def drawText(self, textType, textString, x, y):
-    self.applyFont(textType)
+  def drawText(self, textType, textString, x, y, scaleFactor = 1.0):
+    self.applyFont(textType, scaleFactor)
     self.ctx.move_to(x, y) 
     self.ctx.show_text(textString)
 
-  def applyFont(self, textType):
+  def applyFont(self, textType, scaleFactor = 1.0):
     if textType == FontType.BASIC:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
-      self.ctx.set_font_size(self.baseFontSize) 
+      self.ctx.set_font_size(self.baseFontSize * scaleFactor) 
     elif textType == FontType.MAJOR:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
-      self.ctx.set_font_size(self.baseFontSize) 
+      self.ctx.set_font_size(self.baseFontSize * scaleFactor) 
     elif textType == FontType.MINOR:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
-      self.ctx.set_font_size(self.minorFontSize) 
+      self.ctx.set_font_size(self.minorFontSize * scaleFactor) 
     else:
       raise Exception("Unknown font type" + textType)
     self.ctx.set_source_rgb(0, 0, 0) 

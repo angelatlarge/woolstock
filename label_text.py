@@ -15,14 +15,14 @@ class LabelText:
   @property
   def empty(self): return self.textString
 
-  def measure(self, sheet):
-    return sheet.measureText(self.textType, self.textString)
+  def measure(self, sheet, scaleFactor = 1.0):
+    return sheet.measureText(self.textType, self.textString, scaleFactor)
 
-  def measureSpace(self, sheet):
-    return sheet.measureText(self.textType, " ")
+  def measureSpace(self, sheet, scaleFactor = 1.0):
+    return sheet.measureText(self.textType, " ", scaleFactor)
 
-  def draw(self, sheet, x, y):
-    return sheet.drawText(self.textType, self.textString, x, y)
+  def draw(self, sheet, x, y, scaleFactor = 1.0):
+    return sheet.drawText(self.textType, self.textString, x, y, scaleFactor)
 
   def __str__(self):
     return "LabelText(%s, %s)" % (self.textType, self.textString)

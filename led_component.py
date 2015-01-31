@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 
-from label_sheet import FontType
+from label_sheet import FontType, LabelSheet
 from label_block import LabelBlock
 from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
 from label_text import LabelText
@@ -55,18 +55,18 @@ class LedComponent(Component):
 
 
     if source: 
-      labelLines.append(SingleLabelLine(LabelText(FontType.MINOR, source)))
-    labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(category))))
+      labelLines.append(SingleLabelLine([LabelText(FontType.MINOR, source)], True))
+    labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
 
 
     if summary: 
-      labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, " ".join(summary))))
-    labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, self.propertiesDict["Color"])))
+      labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, " ".join(summary))]))
+    labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, self.propertiesDict["Color"])]))
     if self.propertiesDict["Common"]: 
-      labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])))
+      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])]))
     if filteredSpecs:
       # labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(filteredSpecs))))
-      labelLines.append(WrappingLabelLine(*map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs)))
+      labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs), True))
 
     #   if mountingType == "TH":
     #     summary.append(self.propertiesDict["Size"])
