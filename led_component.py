@@ -19,7 +19,7 @@ class LedComponent(Component):
     category = []
     mountingType = self.propertiesDict["Mounting Type"]
     if mountingType == "TH":
-      category = ["t.h. LED"]
+      category = ["th LED"]
 
       if self.propertiesDict["Shape"] == "ROUND":
         summary.append(self.propertiesDict["Size"])
@@ -31,8 +31,20 @@ class LedComponent(Component):
     elif mountingType == "SMD":
       category = ["SMD LED"]
       summary.append(self.propertiesDict["Size"])
+    elif mountingType == "EMIT":
+      category = ["EMITTER LED"]
     else:
       return None
+
+    source = ""
+    if self.propertiesDict["Manufacturer"]:
+      source = self.propertiesDict["Manufacturer"]
+    elif self.propertiesDict["Source"] and self.propertiesDict["Subsource"]:
+      source = "%s (%s)" % (self.propertiesDict["Source"], self.propertiesDict["Subsource"])
+    elif self.propertiesDict["Source"]:
+      source = self.propertiesDict["Source"]
+
+
 
     specs = []
     specs.append(self.getVoltageDropSpec())
@@ -42,6 +54,8 @@ class LedComponent(Component):
     filteredSpecs = filter(lambda x: x, specs)
 
 
+    if source: 
+      labelLines.append(SingleLabelLine(LabelText(FontType.MINOR, source)))
     labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(category))))
 
 
@@ -51,8 +65,8 @@ class LedComponent(Component):
     if self.propertiesDict["Common"]: 
       labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])))
     if filteredSpecs:
-      labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(filteredSpecs))))
-      labelLines.append(SingleLabelLine(*map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs)))
+      # labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(filteredSpecs))))
+      labelLines.append(WrappingLabelLine(*map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs)))
 
     #   if mountingType == "TH":
     #     summary.append(self.propertiesDict["Size"])
@@ -103,7 +117,7 @@ class LedComponent(Component):
   def getAngleSpec(self):
     angleMin = self.propertiesDict["Angle min"]
     angleMax = self.propertiesDict["Angle max"]
-    if angleMin and angleMin:
+    if angleMin and angleMax:
       return "%s-%s°" % (angleMin, angleMax)
     elif angleMin:
       return "%s°" % (angleMin)

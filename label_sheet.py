@@ -8,7 +8,7 @@ from label_line import LabelLine
 def enum(**enums):
   return type('Enum', (), enums)
 
-FontType = enum(BASIC=1, MAJOR=2)
+FontType = enum(BASIC=1, MAJOR=2, MINOR=3)
 
 
 class LabelSheet:
@@ -22,6 +22,12 @@ class LabelSheet:
     self.xCoord, self.yCoord = (0, 0) if not startCoords else startCoords
     self.moveToLabel(self.xCoord, self.yCoord)
 
+  @property
+  def baseFontFace(self): return "Bitstream Charter"
+  @property
+  def baseFontSize(self): return 0.1
+  @property
+  def minorFontSize(self): return 0.08
   @property
   def sheetWidth(self): return 11.0
   @property
@@ -62,6 +68,8 @@ class LabelSheet:
   @property
   def labelCenterX(self):
     return self.currentLabelX + self.labelWidth / 2.0
+  @property
+  def printableLabelWidth(self): return self.labelWidth - (self.labelMarginX * 2)
 
 
   def draw(self, labelBlock):
@@ -124,13 +132,15 @@ class LabelSheet:
 
   def applyFont(self, textType):
     if textType == FontType.BASIC:
-      self.ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
-      # self.ctx.set_font_size(0.125) 
+      self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
+      self.ctx.set_font_size(self.baseFontSize) 
     elif textType == FontType.MAJOR:
-      self.ctx.select_font_face(family='Asana Math', slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
-      # self.ctx.set_font_size(0.25) 
+      self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
+      self.ctx.set_font_size(self.baseFontSize) 
+    elif textType == FontType.MINOR:
+      self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
+      self.ctx.set_font_size(self.minorFontSize) 
     else:
       raise Exception("Unknown font type" + textType)
-    self.ctx.set_font_size(0.125) 
     self.ctx.set_source_rgb(0, 0, 0) 
 

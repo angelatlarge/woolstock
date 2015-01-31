@@ -12,7 +12,6 @@ def getComponentType(componentName, pluralAllowed=True):
   componentName = componentName.lower().strip()
   for cType, cName in componentTypeNames.iteritems():
       cName = cName.lower().strip()
-      print componentName, cName
       if componentName==cName or (pluralAllowed and componentName==cName+"s"):
         return cType
   return None

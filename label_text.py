@@ -23,3 +23,9 @@ class LabelText:
 
   def draw(self, sheet, x, y):
     return sheet.drawText(self.textType, self.textString, x, y)
+
+  def __str__(self):
+    return "LabelText(%s, %s)" % (self.textType, self.textString)
+
+  def __repr__(self):
+    return self.__str__()
