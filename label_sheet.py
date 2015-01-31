@@ -8,7 +8,7 @@ from label_line import LabelLine
 def enum(**enums):
   return type('Enum', (), enums)
 
-FontType = enum(BASIC=1, MAJOR=2, MINOR=3)
+FontType = enum(BASIC=1, MAJOR=2, MINOR=3, MINORHEADING=4)
 
 
 class LabelSheet:
@@ -146,6 +146,9 @@ class LabelSheet:
       self.ctx.set_font_size(self.baseFontSize * scaleFactor) 
     elif textType == FontType.MINOR:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
+      self.ctx.set_font_size(self.minorFontSize * scaleFactor) 
+    elif textType == FontType.MINORHEADING:
+      self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
       self.ctx.set_font_size(self.minorFontSize * scaleFactor) 
     else:
       raise Exception("Unknown font type" + textType)

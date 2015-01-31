@@ -41,4 +41,6 @@ class DiodeComponent(Component):
 
     labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, specsText)))
 
+    if self.getNotes(): labelLines.append(self.getNotes())
+
     return LabelBlock(*labelLines) if labelLines else None

@@ -58,15 +58,18 @@ class LedComponent(Component):
       labelLines.append(SingleLabelLine([LabelText(FontType.MINOR, source)], True))
     labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
 
-
     if summary: 
       labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, " ".join(summary))]))
     labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, self.propertiesDict["Color"])]))
     if self.propertiesDict["Common"]: 
       labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])]))
+    if self.propertiesDict["Configuration"]: 
+      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, "config: " + self.propertiesDict["Configuration"])]))
     if filteredSpecs:
       # labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(filteredSpecs))))
       labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs), True))
+
+    if self.getNotes(): labelLines.append(self.getNotes())
 
     #   if mountingType == "TH":
     #     summary.append(self.propertiesDict["Size"])
