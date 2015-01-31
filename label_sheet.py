@@ -12,7 +12,7 @@ FontType = enum(BASIC=1, MAJOR=2, MINOR=3)
 
 
 class LabelSheet:
-  def __init__(self, filename, startCoords = None):
+  def __init__(self, filename, startCoords = None, exclusions=[]):
     self.surface = cairo.PDFSurface(filename, self.sheetWidth*72, self.sheetHeight*72)
     # surface = cairo.cairo_ps_surface_create  ("test.ps", WIDTH, HEIGHT)
     # surface = cairo.ImageSurface (cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
@@ -21,6 +21,8 @@ class LabelSheet:
 
     self.xCoord, self.yCoord = (0, 0) if not startCoords else startCoords
     self.moveToLabel(self.xCoord, self.yCoord)
+
+    self.exclusions = exclusions
 
   @property
   def baseFontFace(self): return "Bitstream Charter"
@@ -100,6 +102,9 @@ class LabelSheet:
         self.moveToLabel(0, self.yCoord+1)
     else:
       self.moveToLabel(self.xCoord+1, self.yCoord)
+
+    if (self.xCoord, self.yCoord) in self.exclusions: 
+      self.moveToNextLabel()
 
   def draw_background_labels(self):
     self.ctx.set_source_rgb (0.75,0.75,0.75)

@@ -20,11 +20,12 @@ def main():
   parser.add_argument('--grid', help='Draw label grid', action='store_true')
   parser.add_argument('--start', help='Start position for the first label', nargs=2, type=int)
   parser.add_argument('--comps', help='Names of components to draw', nargs='*', type=str)
+  parser.add_argument('--exclude_labels', help='Coordinates of labels to exclude', nargs=2, type=int, action='append')
   args = parser.parse_args()
 
 
 
-  labelSheet = LabelSheet(args.output)
+  labelSheet = LabelSheet(args.output, None, getLabelExclusions(args))
   if args.grid:   labelSheet.draw_background_labels()
   if args.start: labelSheet.moveToLabel(args.start[0], args.start[1])
   componentClasses = getComponentClasses(args)
@@ -64,6 +65,13 @@ def getComponentClasses(args):
     return filteredClasses
   else:
     return componentClasses
+
+def getLabelExclusions(args):
+  labelExclusions = []
+  if args.exclude_labels:
+    for x, y in args.exclude_labels:
+      labelExclusions.append((x, y))
+  return labelExclusions
 
 
 if __name__ == "__main__":
