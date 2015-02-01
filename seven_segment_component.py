@@ -35,12 +35,13 @@ class SevenSegmentComponent(Component):
 
 
     specs = []
-    print self.getMaxCurrentAsMa()
     specs.append(self.getMaxCurrentAsMa())
-    # specs.append(self.getVoltageDropSpec())
+    specs.append(self.getVoltageDropText())
     # specs.append(self.getMaxCurrentSpec())
     # specs.append(self.getAngleSpec())
-    # specs.append(self.getBrightnessSpec())
+    specs.append(self.getBrightnessText())
+    specs.append(self.getWavelengthText())
+    print self.getWavelengthText()
     # specs.append(self.getPowerSpec())
     filteredSpecs = filter(lambda x: x, specs)
 
