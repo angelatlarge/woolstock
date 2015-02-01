@@ -26,7 +26,7 @@ class DiodeComponent(Component):
     # Forward voltage drop
     specs.append(self.getProp("Vmax, V") + "V")
 
-    # Max current
+    # Max current   
     iMax = float(self.getProp("Imax, A"))
     iMaxText = str(iMax) + "A" if iMax >= 1 else str(int(iMax * 1000)) + "mA"
     specs.append(iMaxText)

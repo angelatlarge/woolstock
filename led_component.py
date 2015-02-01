@@ -40,9 +40,10 @@ class LedComponent(Component):
     specs = []
     specs.append(self.getVoltageDropText())
     specs.append(self.getMaxCurrentAsMa())
+    specs.append(self.getPowerSpec())
     specs.append(self.getAngleSpec())
     specs.append(self.getBrightnessText())
-    specs.append(self.getPowerSpec())
+    specs.append(self.getWavelengthText())
     filteredSpecs = filter(lambda x: x, specs)
 
 
