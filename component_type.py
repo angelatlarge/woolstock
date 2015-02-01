@@ -4,9 +4,13 @@
 def enum(**enums):
   return type('Enum', (), enums)
 
-ComponentType = enum(DIODE=1, LED=2)
+ComponentType = enum(DIODE=1, LED=2, SEVENSEGMENT=3)
 
-componentTypeNames = {ComponentType.DIODE: "diode", ComponentType.LED: "LED"}
+componentTypeNames = {
+  ComponentType.DIODE: "diode", 
+  ComponentType.LED: "LED", 
+  ComponentType.SEVENSEGMENT: "7segment", 
+} 
 
 def getComponentType(componentName, pluralAllowed=True):
   componentName = componentName.lower().strip()

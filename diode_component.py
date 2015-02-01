@@ -18,7 +18,7 @@ class DiodeComponent(Component):
     labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, typeMap[self.propertiesDict["Type"]])))
 
     # ID/NAME
-    labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, self.propertiesDict["ID"])))
+    labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, self.propertiesDict["Name"])))
 
     # SPECS (all on one line)
     specs = []

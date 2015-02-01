@@ -9,7 +9,8 @@ from component import Component
 
 class LedComponent(Component):
   lensTextDict = {"DIFFUSED": "diffused", "CLEAR": "clear"}
-  commonTextDict = {"C": "cmn cathode", "A": "cmn anode"}
+  # commonTextDict = {"C": "cmn cathode", "A": "cmn anode"}
+  commonTextDict = {"C": "cmn CATHODE", "A": "cmn ANODE"}
 
   def makeLabel(self):
     labelLines = []
@@ -36,26 +37,18 @@ class LedComponent(Component):
     else:
       return None
 
-    source = ""
-    if self.propertiesDict["Manufacturer"]:
-      source = self.propertiesDict["Manufacturer"]
-    elif self.propertiesDict["Source"] and self.propertiesDict["Subsource"]:
-      source = "%s (%s)" % (self.propertiesDict["Source"], self.propertiesDict["Subsource"])
-    elif self.propertiesDict["Source"]:
-      source = self.propertiesDict["Source"]
-
-
-
     specs = []
     specs.append(self.getVoltageDropSpec())
-    specs.append(self.getMaxCurrentSpec())
+    specs.append(self.getMaxCurrentAsMa())
     specs.append(self.getAngleSpec())
     specs.append(self.getBrightnessSpec())
+    specs.append(self.getPowerSpec())
     filteredSpecs = filter(lambda x: x, specs)
 
 
-    if source: 
-      labelLines.append(SingleLabelLine([LabelText(FontType.MINOR, source)], True))
+    source = self.getSource()
+    if source: labelLines.append(source)
+
     labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
 
     if summary: 
@@ -71,16 +64,6 @@ class LedComponent(Component):
 
     if self.getNotes(): labelLines.append(self.getNotes())
 
-    #   if mountingType == "TH":
-    #     summary.append(self.propertiesDict["Size"])
-    #     # summary.append(self.propertiesDict["Shape"])
-    #     # summary.append(self.propertiesDict["Color"])
-    #     # summary.append(self.propertiesDict["Lens"])
-    #     # self.propertiesDict["Mounting Type"]
-
-    # elif mountingType == "SMD":
-    #   summary.append(self.propertiesDict["Size"])
-    #   summary.append("SMD")
 
     return LabelBlock(*labelLines) if labelLines else None
 
@@ -101,21 +84,6 @@ class LedComponent(Component):
       return "%1.1f-%1.1f" % (float(vMin), float(vMax))
     else:
       return "%1.1f" % float(vMin)
-
-  def getMaxCurrentSpec(self):
-    maxCurrent = []
-    maxCurrent.append(self.getMaxCUrrent(self.propertiesDict["Imax1, A"]))
-    maxCurrent.append(self.getMaxCUrrent(self.propertiesDict["Imax2, A"]))
-    maxCurrent.append(self.getMaxCUrrent(self.propertiesDict["Imax3, A"]))
-    filteredMaxCurrent = filter(lambda x: x, maxCurrent)
-    if filteredMaxCurrent: 
-      return "/".join(filteredMaxCurrent) + "mA"
-    else:
-      return None
-
-  def getMaxCUrrent(self, iMax):
-    if not iMax: return None
-    return str(int(float(iMax)*1000))
 
   def getAngleSpec(self):
     angleMin = self.propertiesDict["Angle min"]
@@ -145,3 +113,10 @@ class LedComponent(Component):
       return "%s-%s" % (min, max)
     else:
       return "%s" % (min)
+
+  def getPowerSpec(self):
+    power = self.propertiesDict["Max Power, W"]
+    if power:
+      return power + "W"
+    else:
+      return None
