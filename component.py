@@ -74,10 +74,10 @@ class Component(object):
       min = self.getProp(minPropName)
       max = self.getProp(maxPropName) if maxPropNameT else None
       if not min: return None
-      if max:
-        return "%s-%s" % (extractor(min), extractor(max))
-      else:
+      if not max or max == min:
         return extractor(min)
+      else:
+        return "%s-%s" % (extractor(min), extractor(max))
 
     allValues = []
     for idx in range(4):

@@ -7,6 +7,8 @@ import cairocffi as cairo
 from diode_component import DiodeComponent
 from led_component import LedComponent
 from seven_segment_component import SevenSegmentComponent
+from generic_component import GenericComponent
+
 from label_sheet import LabelSheet
 from component_type import ComponentType, getComponentType
 from csv_glob_provider import CsvGlobProvider
@@ -20,12 +22,12 @@ def main():
   group.add_argument('--ods', help='ODS source')
   group.add_argument('--csv', help='CSV source')
   parser.add_argument('-g', '--grid', help='Draw label grid', action='store_true')
-  parser.add_argument('--start', help='Start position for the first label', nargs=2, type=int)
+  parser.add_argument('-s', '--start', help='Start position for the first label', nargs=2, type=int)
   parser.add_argument('-I', '--include_components', help='Names of components to draw', nargs='*', type=str)
   parser.add_argument('-E', '--exclude_components', help='Names of components to exclude', nargs='*', type=str)
   parser.add_argument('-i', '--include_ids', help='Names of components to draw', nargs='*', type=int)
   parser.add_argument('-e', '--exclude_ids', help='Names of components to exclude', nargs='*', type=int)
-  parser.add_argument('--exclude_labels', help='Coordinates of labels to exclude', nargs=2, type=int, action='append')
+  parser.add_argument('-x', '--exclude_labels', help='Coordinates of labels to exclude', nargs=2, type=int, action='append')
   args = parser.parse_args()
 
 
@@ -37,6 +39,7 @@ def main():
     ComponentType.DIODE: DiodeComponent, 
     ComponentType.LED: LedComponent, 
     ComponentType.SEVENSEGMENT: SevenSegmentComponent, 
+    ComponentType.GENERIC: GenericComponent,
   }
 
 

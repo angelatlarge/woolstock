@@ -25,7 +25,7 @@ class SevenSegmentComponent(Component):
 
     labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
 
-    if self.getProp("Size, in"): summary.append(self.getProp("Size, in") + '"')
+    if self.getProp("Size, in"): summary.append(self.getProp("Size, in") + '”')
     if self.getProp("Color"): summary.append(self.getProp("Color"))
 
     labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.MAJOR, t), summary), True))
