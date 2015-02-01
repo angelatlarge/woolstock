@@ -12,7 +12,7 @@ class SevenSegmentComponent(Component):
 
   def makeLabel(self):
 
-    if not self.propertiesDict["Color"]: return None
+    if not self.getProp("Color"): return None
 
     labelLines = []
 
@@ -25,13 +25,13 @@ class SevenSegmentComponent(Component):
 
     labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
 
-    if self.propertiesDict["Size, in"]: summary.append(self.propertiesDict["Size, in"] + '"')
-    if self.propertiesDict["Color"]: summary.append(self.propertiesDict["Color"])
+    if self.getProp("Size, in"): summary.append(self.getProp("Size, in") + '"')
+    if self.getProp("Color"): summary.append(self.getProp("Color"))
 
     labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.MAJOR, t), summary), True))
 
-    if self.propertiesDict["Common"]: 
-      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.propertiesDict["Common"]])]))
+    if self.getProp("Common"): 
+      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.getProp("Common")])]))
 
 
     specs = []
@@ -50,6 +50,8 @@ class SevenSegmentComponent(Component):
       labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs), True))
 
     if self.getNotes(): labelLines.append(self.getNotes())
+
+    self.checkAllPropsUsed()
 
     return LabelBlock(*labelLines) if labelLines else None
 
