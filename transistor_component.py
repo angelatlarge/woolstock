@@ -20,7 +20,7 @@ class TransistorComponent(Component):
       category = [self.getProp("Subtype"), transistorType]
 
       # hFE
-      specs.append(self.getMinMaxValue("hFE min", "hFE max", self.identityExtractor, "hFE"))
+      specs.append(self.getMinMaxValue("hFE min", "hFE max", self.identityExtractor, "h<sub>FE<sub>"))
       # I max
       specs.append(self.getMinMaxValue("IC, A", None, self.ampsAsMilliampsExtractor, "mA"))
       # Vmax

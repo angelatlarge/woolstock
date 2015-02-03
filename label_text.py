@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 
+from HTMLParser import HTMLParser
+from text_attributes import TextAttributes
+
 class TextEntity:
   """
     Class representing the largest textual grouping, an entire label
@@ -90,7 +93,7 @@ class _BrokenLine(object):
     lastText = None
     for textWord in self.textWords:
       if textWord:
-        textW, textH, _= textWord.measure(sheet, self.scaleFactor)
+        textW, textH = textWord.measure(sheet, self.scaleFactor)
         _, _, spaceW = textWord.measureSpace(sheet, self.scaleFactor)
         height = max(height, textH)
         width += textW
@@ -109,7 +112,7 @@ class _BrokenLine(object):
     lastText = None
     for textWord in self.textWords:
       if textWord:
-        w, h, _ = textWord.measure(sheet, self.scaleFactor)
+        w, h = textWord.measure(sheet, self.scaleFactor)
         _, _, spaceW = textWord.measureSpace(sheet, self.scaleFactor)
         if lastText and not textWord.leadingSpace and not lastText.trailingSpace:
           x += (lastSpaceW + spaceW) / 2
@@ -162,7 +165,7 @@ class WrappingTextLine(TextLine):
     for textWord in self.textWords:
       if textWord:
 
-        textW, textH, _= textWord.measure(sheet)
+        textW, textH = textWord.measure(sheet)
         _, _, spaceW = textWord.measureSpace(sheet)
         widthContribution = textW
         if lastText and not textWord.leadingSpace and not lastText.trailingSpace:
@@ -187,10 +190,80 @@ class WrappingTextLine(TextLine):
       wrapLines.append(_BrokenLine(textWords, (width, height), maxWidth))
     return wrapLines
 
-class TextWord:
-  def __init__(self, textType, textString):
+class TextWord(object):
+  def __init__(self, textType, text, defaultAttributes = []):
     self.textType = textType
+    self.textLetters = []
+    self.defaultAttributes = defaultAttributes
+    parser = _TextWordHTMLParser(self, defaultAttributes)
+    parser.feed(text)
+    print self.textLetters
+
+  @property
+  def leadingSpace(self): 
+    return self.textLetters[0].leadingSpace if self.textLetters else False
+
+  @property
+  def trailingSpace(self): 
+    return self.textLetters[-1].trailingSpace if self.textLetters else False
+
+  @property
+  def empty(self): return self.textString
+
+  def measure(self, sheet, scaleFactor = 1.0):
+    width, height = (0, 0)
+    for textLetters in self.textLetters:
+      (w, h, dx) = textLetters.measure(sheet, self.textType, scaleFactor)
+      width += dx
+      height = max(height, h)
+    return (width, height)
+
+  def measureSpace(self, sheet, scaleFactor = 1.0):
+    return sheet.measureText(self.textType, self.defaultAttributes, " ", scaleFactor)
+
+  def draw(self, sheet, x, y, scaleFactor = 1.0):
+    width, height = (0, 0)
+    for textLetters in self.textLetters:
+      (w, h) = textLetters.draw(sheet, self.textType, x + width, y, scaleFactor)
+      width += w
+      height = max(height, h)
+    return (width, height)
+
+  def __str__(self):
+    return "TextWord(%s, %s)" % (self.textType, self.textString)
+
+  def __repr__(self):
+    return self.__str__()
+
+
+class _TextWordHTMLParser(HTMLParser):
+  attributeMap = {"sub": TextAttributes.SUBSCRIPT}
+
+  def __init__(self, textWord, defaultAttributes):
+    HTMLParser.__init__(self)
+    self.textWord = textWord
+    self.currentAttributes = list(defaultAttributes)
+
+  def handle_starttag(self, tag, attrs):
+    if tag.lower() in self.attributeMap:
+      self.currentAttributes.append(self.attributeMap[tag.lower()])
+    else:
+      raise Exception("Unknown tag %s" % (tag))
+
+  def handle_endtag(self, tag):
+    if tag.lower() in self.attributeMap:
+      self.currentAttributes.remove(self.attributeMap[tag.lower()])
+    else:
+      raise Exception("Unknown tag %s" % (tag))
+
+  def handle_data(self, data):
+    self.textWord.textLetters.append(_TextLetters(data, self.currentAttributes))
+
+class _TextLetters:
+
+  def __init__(self, textString, textAttributes):
     self.textString = textString
+    self.textAttributes = list(textAttributes)
 
   @property
   def leadingSpace(self): return self.textString and len(self.textString) > 0 and self.textString[0] == " "
@@ -198,20 +271,14 @@ class TextWord:
   @property
   def trailingSpace(self): return self.textString and len(self.textString) > 0 and self.textString[-1] == " "
 
-  @property
-  def empty(self): return self.textString
+  def measure(self, sheet, textType, scaleFactor = 1.0):
+    return sheet.measureText(textType, self.textAttributes, self.textString, scaleFactor)
 
-  def measure(self, sheet, scaleFactor = 1.0):
-    return sheet.measureText(self.textType, self.textString, scaleFactor)
-
-  def measureSpace(self, sheet, scaleFactor = 1.0):
-    return sheet.measureText(self.textType, " ", scaleFactor)
-
-  def draw(self, sheet, x, y, scaleFactor = 1.0):
-    return sheet.drawText(self.textType, self.textString, x, y, scaleFactor)
+  def draw(self, sheet, textType, x, y, scaleFactor = 1.0):
+    return sheet.drawText(textType, self.textAttributes, self.textString, x, y, scaleFactor)
 
   def __str__(self):
-    return "TextWord(%s, %s)" % (self.textType, self.textString)
+    return "_TextLetters(%s, \"%s\")" % (str(self.textAttributes), self.textString)
 
   def __repr__(self):
     return self.__str__()

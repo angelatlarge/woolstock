@@ -2,6 +2,7 @@
 # This Python file uses the following encoding: utf-8
 
 import cairocffi as cairo
+from text_attributes import TextAttributes
 
 def enum(**enums):
   return type('Enum', (), enums)
@@ -53,6 +54,8 @@ class LabelSheet:
   def interSublabelGapY(self): return 0.125
   @property
   def fontAscentHeightMult(self): return 1.25
+  @property
+  def scriptScale(self): return 0.33
 
   @property
   def currentLabelX(self):
@@ -123,30 +126,39 @@ class LabelSheet:
 
     self.ctx.stroke()
 
-  def measureText(self, textType, textString, scaleFactor = 1.0):
-    self.applyFont(textType, scaleFactor)
+  def measureText(self, textType, textAttributes, textString, scaleFactor = 1.0):
+    self.applyFont(textType, textAttributes, scaleFactor)
     (te_x, te_y, te_width, te_height, te_dx, te_dy) = self.ctx.text_extents(textString)
     (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
     return (te_width, fe_ascent * self.fontAscentHeightMult, te_dx)
 
-  def drawText(self, textType, textString, x, y, scaleFactor = 1.0):
-    self.applyFont(textType, scaleFactor)
-    self.ctx.move_to(x, y) 
+  def drawText(self, textType, textAttributes, textString, x, y, scaleFactor = 1.0):
+    self.applyFont(textType, textAttributes, scaleFactor)
+    attribY = y
+    if TextAttributes.SUBSCRIPT in textAttributes:
+      (fe_ascent, fe_descent, fe_height, fe_max_x_advance, fe_max_y_advance) = self.ctx.font_extents()
+      attribY += fe_descent
+    self.ctx.move_to(x, attribY) 
     self.ctx.show_text(textString)
 
-  def applyFont(self, textType, scaleFactor = 1.0):
+  def applyFont(self, textType, textAttributes, scaleFactor = 1.0):
+    attribScaling = 1.0
+    print ">", textAttributes, "<"
+    if TextAttributes.SUBSCRIPT in textAttributes:
+      attribScaling = self.scriptScale
+
     if textType == FontType.BASIC:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
-      self.ctx.set_font_size(self.baseFontSize * scaleFactor) 
+      self.ctx.set_font_size(self.baseFontSize * scaleFactor * attribScaling) 
     elif textType == FontType.MAJOR:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
-      self.ctx.set_font_size(self.baseFontSize * scaleFactor) 
+      self.ctx.set_font_size(self.baseFontSize * scaleFactor * attribScaling) 
     elif textType == FontType.MINOR:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_NORMAL)
-      self.ctx.set_font_size(self.minorFontSize * scaleFactor) 
+      self.ctx.set_font_size(self.minorFontSize * scaleFactor * attribScaling) 
     elif textType == FontType.MINORHEADING:
       self.ctx.select_font_face(family=self.baseFontFace, slant=cairo.FONT_SLANT_NORMAL, weight=cairo.FONT_WEIGHT_BOLD)
-      self.ctx.set_font_size(self.minorFontSize * scaleFactor) 
+      self.ctx.set_font_size(self.minorFontSize * scaleFactor * attribScaling)
     else:
       raise Exception("Unknown font type" + textType)
     self.ctx.set_source_rgb(0, 0, 0) 
