@@ -2,14 +2,11 @@
 # This Python file uses the following encoding: utf-8
 
 import cairocffi as cairo
-from label_text import LabelText
-from label_line import LabelLine
 
 def enum(**enums):
   return type('Enum', (), enums)
 
 FontType = enum(BASIC=1, MAJOR=2, MINOR=3, MINORHEADING=4)
-
 
 class LabelSheet:
   def __init__(self, filename, startCoords = None, exclusions=[]):

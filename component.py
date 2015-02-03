@@ -2,8 +2,7 @@
 # This Python file uses the following encoding: utf-8
 
 from __future__ import print_function
-from label_text import LabelText
-from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
+from label_text import TextWord, SingleTextLine, WrappingTextLine
 from label_sheet import FontType, LabelSheet
 import sys
 
@@ -24,9 +23,9 @@ class Component(object):
   def getNotes(self):
     notes = self.getProp("Notes")
     if notes:
-      noteTexts = [LabelText(FontType.MINORHEADING, "Notes:")]
-      noteTexts.extend(map(lambda t: LabelText(FontType.MINOR, t), notes.split()))
-      return WrappingLabelLine(noteTexts, True)
+      noteTexts = [TextWord(FontType.MINORHEADING, "Notes:")]
+      noteTexts.extend(map(lambda t: TextWord(FontType.MINOR, t), notes.split()))
+      return WrappingTextLine(noteTexts, True)
     else:
       return None
 
@@ -46,7 +45,7 @@ class Component(object):
       source = self.getProp("Source")
 
     if source: 
-      return SingleLabelLine([LabelText(FontType.MINOR, source)], True)
+      return SingleTextLine([TextWord(FontType.MINOR, source)], True)
     else:
       return None
 

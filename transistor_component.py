@@ -2,20 +2,18 @@
 # This Python file uses the following encoding: utf-8
 
 from label_sheet import FontType, LabelSheet
-from label_block import LabelBlock
-from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
-from label_text import LabelText
+from label_text import TextEntity, TextWord, SingleTextLine, WrappingTextLine
 from led_component import LedComponent
 from component import Component
 
 class TransistorComponent(Component):
 
   def makeLabel(self):
-    labelLines = []
+    textLines = []
     specs = []
 
     source = self.getSource()
-    if source: labelLines.append(source)
+    if source: textLines.append(source)
 
     transistorType = self.getPrintableType()
     if transistorType in ["BJT", "DARLINGTON"]:
@@ -45,11 +43,11 @@ class TransistorComponent(Component):
 
     summary = [self.getProp("Name")]
 
-    labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
-    labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.MAJOR, t), summary), True))
+    textLines.append(SingleTextLine([TextWord(FontType.BASIC, " ".join(category))]))
+    textLines.append(WrappingTextLine(map(lambda t: TextWord(FontType.MAJOR, t), summary), True))
 
     # if self.getProp("Common"): 
-      # labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.getProp("Common")])]))
+      # textLines.append(SingleTextLine([TextWord(FontType.BASIC, LedComponent.commonTextDict[self.getProp("Common")])]))
 
     # specs.append(self.getMaxCurrentAsMa())
     # specs.append(self.getVoltageDropText())
@@ -57,13 +55,13 @@ class TransistorComponent(Component):
     # specs.append(self.getWavelengthText())
     filteredSpecs = filter(lambda x: x, specs)
     if filteredSpecs:
-      labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs), True))
+      textLines.append(WrappingTextLine(map(lambda t: TextWord(FontType.BASIC, t), filteredSpecs), True))
 
-    if self.getNotes(): labelLines.append(self.getNotes())
+    if self.getNotes(): textLines.append(self.getNotes())
 
     self.checkAllPropsUsed()
 
-    return LabelBlock(*labelLines) if labelLines else None
+    return TextEntity(*textLines) if textLines else None
 
   def getPrintableType(self):
     typeMap = {"DARLINGTON": "Darlington"}

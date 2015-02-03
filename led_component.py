@@ -2,9 +2,7 @@
 # This Python file uses the following encoding: utf-8
 
 from label_sheet import FontType, LabelSheet
-from label_block import LabelBlock
-from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
-from label_text import LabelText
+from label_text import TextEntity, TextWord, SingleTextLine, WrappingTextLine
 from component import Component
 
 class LedComponent(Component):
@@ -13,7 +11,7 @@ class LedComponent(Component):
   commonTextDict = {"C": "cmn CATHODE", "A": "cmn ANODE"}
 
   def makeLabel(self):
-    labelLines = []
+    textLines = []
 
 
     summary = []
@@ -48,26 +46,26 @@ class LedComponent(Component):
 
 
     source = self.getSource()
-    if source: labelLines.append(source)
+    if source: textLines.append(source)
 
-    labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, " ".join(category))]))
+    textLines.append(SingleTextLine([TextWord(FontType.BASIC, " ".join(category))]))
 
     if summary: 
-      labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, " ".join(summary))]))
-    labelLines.append(SingleLabelLine([LabelText(FontType.MAJOR, self.getProp("Color"))]))
+      textLines.append(SingleTextLine([TextWord(FontType.MAJOR, " ".join(summary))]))
+    textLines.append(SingleTextLine([TextWord(FontType.MAJOR, self.getProp("Color"))]))
     if self.getProp("Common"): 
-      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, LedComponent.commonTextDict[self.getProp("Common")])]))
+      textLines.append(SingleTextLine([TextWord(FontType.BASIC, LedComponent.commonTextDict[self.getProp("Common")])]))
     if self.getProp("Configuration"): 
-      labelLines.append(SingleLabelLine([LabelText(FontType.BASIC, "config: " + self.getProp("Configuration"))]))
+      textLines.append(SingleTextLine([TextWord(FontType.BASIC, "config: " + self.getProp("Configuration"))]))
     if filteredSpecs:
-      # labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, " ".join(filteredSpecs))))
-      labelLines.append(WrappingLabelLine(map(lambda t: LabelText(FontType.BASIC, t), filteredSpecs), True))
+      # textLines.append(SingleTextLine(TextWord(FontType.BASIC, " ".join(filteredSpecs))))
+      textLines.append(WrappingTextLine(map(lambda t: TextWord(FontType.BASIC, t), filteredSpecs), True))
 
-    if self.getNotes(): labelLines.append(self.getNotes())
+    if self.getNotes(): textLines.append(self.getNotes())
 
     self.checkAllPropsUsed()
 
-    return LabelBlock(*labelLines) if labelLines else None
+    return TextEntity(*textLines) if textLines else None
 
 
   def getAngleSpec(self):

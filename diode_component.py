@@ -2,9 +2,7 @@
 # This Python file uses the following encoding: utf-8
 
 from label_sheet import FontType
-from label_block import LabelBlock
-from label_line import LabelLine, SingleLabelLine, WrappingLabelLine
-from label_text import LabelText
+from label_text import TextEntity, TextWord, SingleTextLine
 from component import Component
 
 class DiodeComponent(Component):
@@ -12,13 +10,13 @@ class DiodeComponent(Component):
   def makeLabel(self):
     typeMap = {"GENERAL": "diode", "SCHOTTKY": "schottky diode"}
 
-    labelLines = []
+    textLines = []
 
     # TYPE
-    labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, typeMap[self.getProp("Type")])))
+    textLines.append(SingleTextLine(TextWord(FontType.BASIC, typeMap[self.getProp("Type")])))
 
     # ID/NAME
-    labelLines.append(SingleLabelLine(LabelText(FontType.MAJOR, self.getProp("ID"))))
+    textLines.append(SingleTextLine(TextWord(FontType.MAJOR, self.getProp("ID"))))
 
     # SPECS (all on one line)
     specs = []
@@ -39,8 +37,8 @@ class DiodeComponent(Component):
 
     specsText = " ".join(specs)
 
-    labelLines.append(SingleLabelLine(LabelText(FontType.BASIC, specsText)))
+    textLines.append(SingleTextLine(TextWord(FontType.BASIC, specsText)))
 
     self.checkAllPropsUsed()
 
-    return LabelBlock(*labelLines) if labelLines else None
+    return TextEntity(*textLines) if textLines else None
