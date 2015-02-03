@@ -9,6 +9,7 @@ ComponentType = enum(
   LED=2, 
   SEVENSEGMENT=3, 
   GENERIC=4, 
+  TRANSISTOR=4, 
 )
 
 componentTypeNames = {
@@ -16,6 +17,7 @@ componentTypeNames = {
   ComponentType.LED: "LED", 
   ComponentType.SEVENSEGMENT: "7segment", 
   ComponentType.GENERIC: "generic", 
+  ComponentType.TRANSISTOR: "transistor", 
 } 
 
 def getComponentType(componentName, pluralAllowed=True):

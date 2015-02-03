@@ -8,6 +8,12 @@ from label_sheet import FontType, LabelSheet
 import sys
 
 class Component(object):
+
+  @staticmethod
+  def ampsAsMilliampsExtractor(iMax): return str(int(float(iMax)*1000))
+  @staticmethod
+  def identityExtractor(x): return x
+
   def __init__(self, propertiesDict):
     self.propertiesDict = propertiesDict
     self._checkedProps = set(["ID"])
@@ -45,12 +51,10 @@ class Component(object):
       return None
 
   def getMaxCurrentAsMa(self):
-    extractor = lambda iMax: str(int(float(iMax)*1000))
-    return self.getMinMaxValue("Imax%s, A", None, extractor, "mA")
+    return self.getMinMaxValue("Imax%s, A", None, ampsAsMilliampsExtractor, "mA")
 
   def getBrightnessText(self):
-    extractor = lambda x: x
-    brightnessText = self.getMinMaxValue("Brightness%s min", "Brightness%s max", extractor, self.getProp("Brightness units", ""))
+    brightnessText = self.getMinMaxValue("Brightness%s min", "Brightness%s max", Compoent.identityExtractor, self.getProp("Brightness units", ""))
     if self.getProp("Brightness units"): 
       return brightnessText
     else:
@@ -64,7 +68,7 @@ class Component(object):
     extractor = lambda x: "%1.1f" % float(x)
     return self.getMinMaxValue("Drop%s min, V", "Drop%s max, V", extractor, "V")
 
-  def getMinMaxValue(self, minPropNameT, maxPropNameT, extractor, unitString):
+  def getMinMaxValue(self, minPropNameT, maxPropNameT, extractor, unitString=None):
     """
       Given at least one name template (minPropNameT) an field value to string converter
       and a unit string, get up to three min/max or precise property and format them for the label
@@ -82,8 +86,12 @@ class Component(object):
     allValues = []
     for idx in range(4):
       idxSubst = "" if idx == 0 else str(idx)
-      minPropName = minPropNameT % (idxSubst)
-      maxPropName = maxPropNameT % (idxSubst) if maxPropNameT else None
+      try:
+        minPropName = minPropNameT % (idxSubst)
+        maxPropName = maxPropNameT % (idxSubst) if maxPropNameT else None
+      except TypeError:
+        minPropName = minPropNameT
+        maxPropName = maxPropNameT if maxPropNameT else None
       minMaxString = getMinMaxString(minPropName, maxPropName)
       if minMaxString: allValues.append(minMaxString)
       if idx == 0 and allValues: break

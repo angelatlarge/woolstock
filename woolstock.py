@@ -8,6 +8,7 @@ from diode_component import DiodeComponent
 from led_component import LedComponent
 from seven_segment_component import SevenSegmentComponent
 from generic_component import GenericComponent
+from transistor_component import TransistorComponent
 
 from label_sheet import LabelSheet
 from component_type import ComponentType, getComponentType
@@ -40,6 +41,7 @@ def main():
     ComponentType.LED: LedComponent, 
     ComponentType.SEVENSEGMENT: SevenSegmentComponent, 
     ComponentType.GENERIC: GenericComponent,
+    ComponentType.TRANSISTOR: TransistorComponent,
   }
 
 
